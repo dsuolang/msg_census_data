@@ -159,7 +159,8 @@ df[edu_cols] <- lapply(df[edu_cols], function(x) {
 })
 # =======ethnicity (hispanic override if from hispanic origin country)
 eth_cols <- grep("^ethnicgroup_", names(df), value = TRUE)
-hisp_cols <- grep("^hispaniccountryoforigin_", names(df), value = TRUE)
+#hisp_cols <- grep("^hispaniccountryoforigin_", names(df), value = TRUE)
+hisp_codes <- c(13)
 white_codes <- c(5,6,7,8,9,10,11,15,16,23,25,26,27,28,29,30,33)
 black_codes <- c(1,2)
 other_codes <- c(3,4,12,14,17,18,19,20,21,22,24,32)
@@ -167,50 +168,56 @@ df[eth_cols] <- Map(function(eth, hisp) {
   eth <- as.numeric(eth)
   hisp <- as.numeric(hisp)
   case_when(
-    hisp >= 0 & hisp <= 19 ~ "hispanic",
+    eth %in% hisp_codes  ~ "hispanic",
     eth %in% black_codes ~ "non-hispanic black",
     eth %in% white_codes ~ "non-hispanic white",
     eth %in% other_codes ~ "other",
     TRUE ~ NA_character_
   )
-}, df[eth_cols], df[hisp_cols])
+}, df[eth_cols])
+
 # =======language
 lang_cols <- grep("^languagespoken_", names(df), value = TRUE)
 asian_lang <- c(50,53,56,57,58,62)
-me_lang <- c(34,46,68,70)
-other_lang <- c(10,17,19,21,22,30,33)
+other_lang <- c(34,46,68,70,
+                10,17,19,21,22,30,33)
 df[lang_cols] <- lapply(df[lang_cols], function(x) {
   x <- as.numeric(x)
   case_when(
     x == 1 ~ "english",
     x == 20 ~ "spanish",
     x %in% asian_lang ~ "asian languages",
-    x %in% me_lang ~ "middle eastern languages",
     x %in% other_lang ~ "other languages",
     TRUE ~ NA_character_
   )
 })
 # =======occupation
 occ_cols <- grep("^occupation_", names(df), value = TRUE)
-prof <- c(23,36,37,38,44,45,46,47,48,49,50,51)
-mgmt <- c(3,4,10,18,31,53,20,11,14)
-service <- c(5,6,22,30,32,33,34,39,40,41,42,43,54,21,16)
-manual <- c(7,12,15,35,13)
-self <- c(11,20)
-other_occ <- c(1,8,9,52,55)
+
+not_employed <- c(1,8,9,52)
+mgmt <- c(3,4,10,20)
+self_home <- c(11,16)
+prof <- c(2,23,32,33,34,36,51,38)
+health_edu_social <- c(17,21,39,40,41,42,43,44,45,46,47,48,49,50)
+service <- c(5,6,22,18,37,53,30,31,54)
+manual <- c(7,12,15,35)
+gov_mil_rel <- c(13,14,55)
+
 df[occ_cols] <- lapply(df[occ_cols], function(x) {
   x <- as.numeric(x)
-  case_when(
-    x %in% self ~ "self-employed",
-    x %in% prof ~ "professional/technical/specialized",
-    x %in% mgmt ~ "management/business/administration",
-    x %in% service ~ "service/sales/support",
-    x %in% manual ~ "manual/military/labor/agriculture",
-    x %in% other_occ ~ "notemployed/other",
+  
+  dplyr::case_when(
+    x %in% not_employed ~ "notemployed",
+    x %in% mgmt ~ "management/business",
+    x %in% self_home ~ "selfemployed/home-based",
+    x %in% prof ~ "professional/technical",
+    x %in% health_edu_social ~ "health/education/social",
+    x %in% service ~ "sales/admin/finance/services/other",
+    x %in% manual ~ "skilled/labor/manual/agriculture",
+    x %in% gov_mil_rel ~ "government/military/religious",
     TRUE ~ NA_character_
   )
 })
-
 # =======lifestyle group
 life_cols <- grep("^lifestylegroup_", names(df), value = TRUE)
 df[life_cols] <- lapply(df[life_cols], function(x) {
@@ -424,7 +431,8 @@ df[edu_cols] <- lapply(df[edu_cols], function(x) {
 })
 # =======ethnicity (hispanic override if from hispanic origin country)
 eth_cols <- grep("^ethnicgroup_", names(df), value = TRUE)
-hisp_cols <- grep("^hispaniccountryoforigin_", names(df), value = TRUE)
+#hisp_cols <- grep("^hispaniccountryoforigin_", names(df), value = TRUE)
+hisp_codes <- c(13)
 white_codes <- c(5,6,7,8,9,10,11,15,16,23,25,26,27,28,29,30,33)
 black_codes <- c(1,2)
 other_codes <- c(3,4,12,14,17,18,19,20,21,22,24,32)
@@ -432,19 +440,19 @@ df[eth_cols] <- Map(function(eth, hisp) {
   eth <- as.numeric(eth)
   hisp <- as.numeric(hisp)
   case_when(
-    hisp >= 0 & hisp <= 19 ~ "hispanic",
+    eth %in% hisp_codes ~  "hispanic",
     eth %in% black_codes ~ "non-hispanic black",
     eth %in% white_codes ~ "non-hispanic white",
     eth %in% other_codes ~ "other",
     TRUE ~ NA_character_
   )
-}, df[eth_cols], df[hisp_cols])
+}, df[eth_cols])
 # =======language
 lang_cols <- grep("^languagespoken_", names(df), value = TRUE)
 asian_lang <- c(48,49,50,51,52,53,54,56,57,58,59,60,61,62,63,64,65,
                "7A","7E","80","7F","94","9N")
-me_lang <- c(27,29,31,32,34,44,45,46,47,68,70)
-other_lang <- c(3,4,5,6,7,8,9,10,12,13,14,17,19,21,22,23,24,25,
+other_lang <- c(27,29,31,32,34,44,45,46,47,68,70,
+                3,4,5,6,7,8,9,10,12,13,14,17,19,21,22,23,24,25,
                 30,35,36,37,38,40,41,
                 "95","97","9E","9F","9J","9K","9L","9O","9R","9S")
 df[lang_cols] <- lapply(df[lang_cols], function(x) {
@@ -453,22 +461,33 @@ df[lang_cols] <- lapply(df[lang_cols], function(x) {
     x == "01" ~ "english",
     x == "20" ~ "spanish",
     x %in% asian_lang ~ "asian languages",
-    x %in% me_lang ~ "middle eastern languages",
     x %in% other_lang ~ "other languages",
     TRUE ~ NA_character_
   )
 })
 # =======occupation
 occ_cols <- grep("^occupation_", names(df), value = TRUE)
+
 df[occ_cols] <- lapply(df[occ_cols], function(x) {
   x <- as.character(x)
-  case_when(
-    x %in% c("A","V","W","X","Y") ~ "professional/technical/specialized",
-    x == "B" ~ "management/business/administration",
-    x %in% c("C","D","O","P","2","3","4") ~ "service/sales/support",
-    x %in% c("E","I","J","Q","6","8") ~ "manual/military/labor/agriculture",
-    x %in% c("L","M","N") ~ "self-employed",
-    x %in% c("F","G","H","K","R","S","T","U","Z") ~ "notemployed/other",
+  
+  dplyr::case_when(
+    x %in% c("F","G","H") ~ "notemployed",
+    
+    x %in% c("B") ~ "management/business",
+    
+    x %in% c("L","M","N","O","P","Q","R","S","T","U") ~ "selfemployed/home-based",
+    
+    x %in% c("A","W","X") ~ "professional/technical",
+    
+    x %in% c("V","Y") ~ "health/education/social",
+    
+    x %in% c("C","D","2","3","4","Z") ~ "sales/admin/finance/services/other",
+    
+    x %in% c("E","I","6","8") ~ "skilled/labor/manual/agriculture",
+    
+    x %in% c("J","K","1") ~ "government/military/religious",
+    
     TRUE ~ NA_character_
   )
 })
