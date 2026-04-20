@@ -166,7 +166,7 @@ black_codes <- c(1,2)
 other_codes <- c(3,4,12,14,17,18,19,20,21,22,24,32)
 df[eth_cols] <- Map(function(eth, hisp) {
   eth <- as.numeric(eth)
-  hisp <- as.numeric(hisp)
+  #hisp <- as.numeric(hisp)
   case_when(
     eth %in% hisp_codes  ~ "hispanic",
     eth %in% black_codes ~ "non-hispanic black",
@@ -438,7 +438,7 @@ black_codes <- c(1,2)
 other_codes <- c(3,4,12,14,17,18,19,20,21,22,24,32)
 df[eth_cols] <- Map(function(eth, hisp) {
   eth <- as.numeric(eth)
-  hisp <- as.numeric(hisp)
+  #hisp <- as.numeric(hisp)
   case_when(
     eth %in% hisp_codes ~  "hispanic",
     eth %in% black_codes ~ "non-hispanic black",
